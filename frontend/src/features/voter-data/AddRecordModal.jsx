@@ -96,24 +96,24 @@ const AddRecordModal = ({ onClose, onSubmit }) => {
               <h3 className="text-sm font-medium text-muted-foreground mb-4 uppercase tracking-wider">Voter Demographics</h3>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-sm font-medium text-emerald-600 dark:text-emerald-400">Male</label>
+                  <label className="text-sm font-medium text-emerald-600">Male</label>
                   <input 
                     type="number" name="male_count" value={formData.male_count} onChange={handleChange} min="0" placeholder="0"
-                    className="w-full px-3 py-2 bg-background border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                    className="w-full px-3 py-2 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-sm font-medium text-rose-600 dark:text-rose-400">Female</label>
+                  <label className="text-sm font-medium text-rose-600">Female</label>
                   <input 
                     type="number" name="female_count" value={formData.female_count} onChange={handleChange} min="0" placeholder="0"
-                    className="w-full px-3 py-2 bg-background border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500/50"
+                    className="w-full px-3 py-2 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500/50"
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-sm font-medium text-amber-600 dark:text-amber-400">Others</label>
+                  <label className="text-sm font-medium text-amber-600">Others</label>
                   <input 
                     type="number" name="other_count" value={formData.other_count} onChange={handleChange} min="0" placeholder="0"
-                    className="w-full px-3 py-2 bg-background border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500/50"
+                    className="w-full px-3 py-2 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500/50"
                   />
                 </div>
                 <div className="space-y-1.5 pt-6">

@@ -3,8 +3,8 @@ from sqlalchemy.orm import Session
 from database import get_db
 from models import ElectionData
 from schemas import RecordCreate, RecordResponse, PaginatedResponse, SummaryResponse
-from typing import List
-from sqlalchemy import func
+from typing import List, Optional
+from sqlalchemy import func, or_
 
 router = APIRouter(prefix="/records", tags=["Records"])
 
@@ -25,10 +25,55 @@ def get_summary(db: Session = Depends(get_db)):
     }
 
 @router.get("", response_model=PaginatedResponse)
-def get_records(page: int = Query(1, ge=1), limit: int = Query(20, ge=1, le=100), db: Session = Depends(get_db)):
+def get_records(
+    page: int = Query(1, ge=1), 
+    limit: int = Query(20, ge=1, le=100), 
+    search: Optional[str] = None,
+    ward: Optional[int] = None,
+    part: Optional[int] = None,
+    street: Optional[str] = None,
+    area: Optional[str] = None,
+    min_votes: Optional[int] = None,
+    max_votes: Optional[int] = None,
+    min_total: Optional[int] = None,
+    max_total: Optional[int] = None,
+    db: Session = Depends(get_db)
+):
     skip = (page - 1) * limit
-    total = db.query(ElectionData).count()
-    records = db.query(ElectionData).offset(skip).limit(limit).all()
+    query = db.query(ElectionData)
+    
+    if search:
+        search_term = f"%{search}%"
+        query = query.filter(
+            or_(
+                ElectionData.street.ilike(search_term),
+                ElectionData.voter_area.ilike(search_term),
+                ElectionData.booth_address.ilike(search_term)
+            )
+        )
+        
+    if ward is not None:
+        query = query.filter(ElectionData.ward_no == ward)
+    if part is not None:
+        query = query.filter(ElectionData.part_no == part)
+        
+    if street:
+        query = query.filter(ElectionData.street.ilike(f"%{street}%"))
+    if area:
+        query = query.filter(ElectionData.voter_area.ilike(f"%{area}%"))
+        
+    if min_votes is not None:
+        query = query.filter(ElectionData.vote_count >= min_votes)
+    if max_votes is not None:
+        query = query.filter(ElectionData.vote_count <= max_votes)
+        
+    if min_total is not None:
+        query = query.filter(ElectionData.total_voters >= min_total)
+    if max_total is not None:
+        query = query.filter(ElectionData.total_voters <= max_total)
+        
+    total = query.count()
+    records = query.offset(skip).limit(limit).all()
     
     return {
         "total_records": total,

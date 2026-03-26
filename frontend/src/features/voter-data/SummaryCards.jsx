@@ -35,31 +35,29 @@ const SummaryCards = ({ summary, loading }) => {
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
       {cards.map((card, index) => {
         const Icon = card.icon;
         return (
           <motion.div
             key={card.title}
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
-            className="border-white/5 glass-panel rounded-xl p-5 shadow-sm"
+            className="bg-white border border-border rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow h-full flex items-center justify-between"
           >
             <div className="flex flex-col gap-1">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground mb-1">{card.title}</p>
-                {loading ? (
-                  <div className="h-8 w-24 bg-muted animate-pulse rounded"></div>
-                ) : (
-                  <h3 className="text-2xl font-bold tracking-tight text-foreground">
-                    {card.value.toLocaleString()}
-                  </h3>
-                )}
-              </div>
-              <div className={`p-3 rounded-xl ${card.bg}`}>
-                <Icon className={`w-5 h-5 ${card.color}`} />
-              </div>
+              <p className="text-sm font-medium text-muted-foreground">{card.title}</p>
+              {loading ? (
+                <div className="h-8 w-24 bg-muted animate-pulse rounded mt-1"></div>
+              ) : (
+                <h3 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground mt-1">
+                  {card.value.toLocaleString()}
+                </h3>
+              )}
+            </div>
+            <div className={`p-3 rounded-xl ${card.bg} flex-shrink-0`}>
+              <Icon className={`w-6 h-6 ${card.color}`} />
             </div>
           </motion.div>
         );

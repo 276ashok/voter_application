@@ -4,6 +4,7 @@ import { AnimatePresence } from 'framer-motion';
 import MainLayout from './components/layout/MainLayout';
 import SummaryCards from './features/voter-data/SummaryCards';
 import DataTable from './features/voter-data/DataTable';
+import FilterBar from './features/voter-data/FilterBar';
 import UploadZone from './features/voter-data/UploadZone';
 import AddRecordModal from './features/voter-data/AddRecordModal';
 import RecordDetailsModal from './features/voter-data/RecordDetailsModal';
@@ -20,6 +21,12 @@ function App() {
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(20);
+
+  const initialFilters = {
+    search: '', ward: '', part: '', street: '', area: '',
+    min_votes: '', max_votes: '', min_total: '', max_total: ''
+  };
+  const [filters, setFilters] = useState(initialFilters);
 
   const [loadingRecords, setLoadingRecords] = useState(false);
   const [loadingSummary, setLoadingSummary] = useState(false);
@@ -44,7 +51,17 @@ function App() {
   const fetchRecords = useCallback(async (pageNum = 1) => {
     setLoadingRecords(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/records?page=${pageNum}&limit=${limit}`);
+      const params = new URLSearchParams();
+      params.append('page', pageNum);
+      params.append('limit', limit);
+      
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value !== '' && value !== null) {
+          params.append(key, value);
+        }
+      });
+
+      const res = await fetch(`${API_BASE_URL}/records?${params.toString()}`);
       if (res.ok) {
         const data = await res.json();
         setRecords(data.data);
@@ -63,7 +80,7 @@ function App() {
 
   useEffect(() => {
     fetchRecords(page);
-  }, [page, fetchRecords]);
+  }, [page, fetchRecords, limit, filters]);
 
   const handleUploadSuccess = () => {
     fetchSummary();
@@ -104,6 +121,19 @@ function App() {
 
       <div className="mt-8 mb-4">
         <h2 className="text-xl font-semibold tracking-tight text-foreground mb-4">Voter Directory</h2>
+        
+        <FilterBar 
+          filters={filters} 
+          setFilters={(newFilters) => {
+            setFilters(newFilters);
+            setPage(1); // reset to page 1 on filter
+          }} 
+          onClear={() => {
+            setFilters(initialFilters);
+            setPage(1);
+          }}
+        />
+
         <DataTable
           data={records}
           loading={loadingRecords}

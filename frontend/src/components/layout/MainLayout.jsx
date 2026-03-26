@@ -1,41 +1,33 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Navbar from './Navbar';
 import Sidebar from './Sidebar';
 
 const MainLayout = ({ children, onAddRecord, onUpload }) => {
-  // Theme logic
-  const [isDark, setIsDark] = useState(true);
-
-  useEffect(() => {
-    const root = window.document.documentElement;
-    if (isDark) {
-      root.classList.add('dark');
-    } else {
-      root.classList.remove('dark');
-    }
-  }, [isDark]);
-
-  const toggleTheme = () => setIsDark(!isDark);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-background text-foreground font-sans relative">
-      {/* Background Gradient */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-500/10 via-background to-background pointer-events-none -z-10" />
-      
+    <div className="min-h-screen bg-background text-foreground font-sans flex flex-col">
       <Navbar 
         onAddRecord={onAddRecord} 
         onUpload={onUpload} 
-        toggleTheme={toggleTheme}
-        isDark={isDark}
+        toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
       />
-      <div className="flex">
-        <Sidebar />
-        <main className="flex-1 min-h-[calc(100vh-4rem)]">
-          <div className="p-6 md:p-8 max-w-7xl mx-auto">
+      <div className="flex flex-1 overflow-hidden">
+        <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
+        <main className="flex-1 w-full min-w-0 overflow-y-auto">
+          <div className="p-4 md:p-6 max-w-7xl mx-auto pb-24">
             {children}
           </div>
         </main>
       </div>
+      
+      {/* Mobile Sidebar Overlay */}
+      {isSidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black/30 z-30 md:hidden backdrop-blur-sm"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
     </div>
   );
 };

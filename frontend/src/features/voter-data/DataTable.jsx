@@ -17,20 +17,20 @@ const DataTable = ({ data, loading, page, total, setPage, limit = 20, setLimit, 
         header: 'Street',
         cell: info => {
           const val = info.getValue() || '-';
-          return <div className="max-w-[170px] truncate mx-auto text-center" title={val}>{val}</div>;
+          return <div className="max-w-[150px] md:max-w-[200px] truncate mx-auto text-left" title={val}>{val}</div>;
         }
       },
       { 
         accessorKey: 'vote_count', 
-        header: 'Votes', 
-        cell: info => info.getValue() || 0 
+        header: () => <div className="text-right pr-2">Votes</div>, 
+        cell: info => <div className="text-right pr-2 font-medium">{info.getValue() || 0}</div> 
       },
       { 
         accessorKey: 'booth_address', 
         header: 'Booth Address',
         cell: info => {
           const val = info.getValue() || '-';
-          return <div className="max-w-[170px] truncate mx-auto text-center" title={val}>{val}</div>;
+          return <div className="max-w-[150px] md:max-w-[200px] truncate mx-auto text-left" title={val}>{val}</div>;
         }
       },
       { 
@@ -38,28 +38,28 @@ const DataTable = ({ data, loading, page, total, setPage, limit = 20, setLimit, 
         header: 'Area',
         cell: info => {
           const val = info.getValue() || '-';
-          return <div className="max-w-[150px] truncate mx-auto text-center" title={val}>{val}</div>;
+          return <div className="max-w-[120px] md:max-w-[180px] truncate mx-auto text-left" title={val}>{val}</div>;
         }
       },
       { 
         accessorKey: 'male_count', 
-        header: 'Male', 
-        cell: info => info.getValue() || 0 
+        header: () => <div className="text-right pr-2">Male</div>,  
+        cell: info => <div className="text-right pr-2">{info.getValue() || 0}</div> 
       },
       { 
         accessorKey: 'female_count', 
-        header: 'Female', 
-        cell: info => info.getValue() || 0 
+        header: () => <div className="text-right pr-2">Female</div>,  
+        cell: info => <div className="text-right pr-2">{info.getValue() || 0}</div> 
       },
       { 
         accessorKey: 'other_count', 
-        header: 'Others', 
-        cell: info => info.getValue() || 0 
+        header: () => <div className="text-right pr-2">Others</div>,  
+        cell: info => <div className="text-right pr-2">{info.getValue() || 0}</div>  
       },
       { 
         accessorKey: 'total_voters', 
-        header: () => <div className="font-bold text-primary">Total</div>, 
-        cell: info => <div className="font-bold text-primary bg-primary/10 px-2 py-1 rounded inline-block min-w-[2rem]">{info.getValue()}</div> 
+        header: () => <div className="text-right pr-2 font-bold text-primary">Total</div>, 
+        cell: info => <div className="text-right pr-2 font-bold text-primary"><span className="bg-primary/10 px-2 py-1 rounded inline-block min-w-[2.5rem] text-center">{info.getValue() || 0}</span></div> 
       },
     ],
     []
@@ -77,8 +77,8 @@ const DataTable = ({ data, loading, page, total, setPage, limit = 20, setLimit, 
 
   return (
     <div className="flex flex-col glass-panel rounded-xl shadow-sm overflow-hidden">
-      <div className="overflow-x-auto relative min-h-[400px]">
-        <table className="w-full text-sm text-center border-collapse">
+      <div className="overflow-x-auto relative">
+        <table className="w-full text-sm text-left border-collapse min-w-[1000px]">
           <thead className="text-xs text-muted-foreground uppercase bg-muted/80 backdrop-blur-md sticky top-0 z-10 shadow-sm">
             {table.getHeaderGroups().map(headerGroup => (
               <tr key={headerGroup.id}>
@@ -177,7 +177,7 @@ const DataTable = ({ data, loading, page, total, setPage, limit = 20, setLimit, 
         </table>
       </div>
 
-      <div className="border-t border-white/5 p-4 flex items-center justify-between bg-card/40 text-sm">
+      <div className="border-t border-border p-4 flex flex-col sm:flex-row items-center justify-between bg-white text-sm gap-4">
         <div className="text-muted-foreground flex items-center gap-4">
           <div>
             Showing <span className="font-medium text-foreground">{total === 0 ? 0 : (page - 1) * limit + 1}</span> to <span className="font-medium text-foreground">{Math.min(page * limit, total)}</span> of <span className="font-medium text-foreground">{total}</span> results
