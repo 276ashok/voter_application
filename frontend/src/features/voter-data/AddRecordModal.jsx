@@ -10,6 +10,7 @@ const AddRecordModal = ({ onClose, onSubmit }) => {
     serial_no: '',
     booth_address: '',
     voter_area: '',
+    vote_count: '',
     male_count: 0,
     female_count: 0,
     other_count: 0,
@@ -89,6 +90,22 @@ const AddRecordModal = ({ onClose, onSubmit }) => {
                 type="text" name="voter_area" value={formData.voter_area} onChange={handleChange}
                 dir="auto"
                 className="w-full px-3 py-2 bg-background border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 transition-shadow font-tamil"
+              />
+            </div>
+
+            <div className="space-y-1.5 md:col-span-2 focus-within:text-primary">
+              <label className="text-sm font-medium text-foreground">Booth Address</label>
+              <input 
+                type="text" name="booth_address" value={formData.booth_address} onChange={handleChange}
+                className="w-full px-3 py-2 bg-background border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 transition-shadow"
+              />
+            </div>
+
+            <div className="space-y-1.5 focus-within:text-primary">
+              <label className="text-sm font-medium text-foreground">Vote Count</label>
+              <input 
+                type="number" name="vote_count" value={formData.vote_count} onChange={handleChange} min="0" placeholder="0"
+                className="w-full px-3 py-2 bg-background border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 transition-shadow"
               />
             </div>
 

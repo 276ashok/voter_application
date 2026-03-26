@@ -72,7 +72,7 @@ function App() {
       console.error('Failed to fetch records', err);
     }
     setLoadingRecords(false);
-  }, [limit]);
+  }, [limit, filters]);
 
   useEffect(() => {
     fetchSummary();
@@ -125,8 +125,14 @@ function App() {
         <FilterBar 
           filters={filters} 
           setFilters={(newFilters) => {
-            setFilters(newFilters);
-            setPage(1); // reset to page 1 on filter
+            // Only update page to 1 if the filters actually changed to avoid infinite fetch loops
+            setFilters(prev => {
+              if (JSON.stringify(prev) !== JSON.stringify(newFilters)) {
+                setPage(1);
+                return newFilters;
+              }
+              return prev;
+            });
           }} 
           onClear={() => {
             setFilters(initialFilters);
