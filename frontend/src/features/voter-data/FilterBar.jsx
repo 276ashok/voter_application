@@ -11,7 +11,8 @@ const FilterBar = ({ filters, setFilters, onClear }) => {
       setFilters(localFilters);
     }, 500);
     return () => clearTimeout(timer);
-  }, [localFilters, setFilters]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [localFilters]);
 
   // Sync if external clear happens
   useEffect(() => {

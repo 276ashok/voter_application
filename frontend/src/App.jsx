@@ -13,6 +13,11 @@ import './index.css';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 
+const initialFilters = {
+  search: '', ward: '', part: '', street: '', area: '',
+  min_votes: '', max_votes: '', min_total: '', max_total: ''
+};
+
 function App() {
   const [records, setRecords] = useState([]);
   const [summary, setSummary] = useState(null);
@@ -22,10 +27,6 @@ function App() {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(20);
 
-  const initialFilters = {
-    search: '', ward: '', part: '', street: '', area: '',
-    min_votes: '', max_votes: '', min_total: '', max_total: ''
-  };
   const [filters, setFilters] = useState(initialFilters);
 
   const [loadingRecords, setLoadingRecords] = useState(false);
@@ -107,6 +108,21 @@ function App() {
     }
   };
 
+  const handleSetFilters = useCallback((newFilters) => {
+    setFilters(prev => {
+      if (JSON.stringify(prev) !== JSON.stringify(newFilters)) {
+        setPage(1);
+        return newFilters;
+      }
+      return prev;
+    });
+  }, []);
+
+  const handleClearFilters = useCallback(() => {
+    setFilters(initialFilters);
+    setPage(1);
+  }, []); 
+
   return (
     <MainLayout
       onAddRecord={() => setIsModalOpen(true)}
@@ -124,21 +140,10 @@ function App() {
         
         <FilterBar 
           filters={filters} 
-          setFilters={(newFilters) => {
-            // Only update page to 1 if the filters actually changed to avoid infinite fetch loops
-            setFilters(prev => {
-              if (JSON.stringify(prev) !== JSON.stringify(newFilters)) {
-                setPage(1);
-                return newFilters;
-              }
-              return prev;
-            });
-          }} 
-          onClear={() => {
-            setFilters(initialFilters);
-            setPage(1);
-          }}
+          setFilters={handleSetFilters} 
+          onClear={handleClearFilters}
         />
+
 
         <DataTable
           data={records}
