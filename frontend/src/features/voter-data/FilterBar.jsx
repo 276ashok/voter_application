@@ -24,7 +24,10 @@ const FilterBar = ({ filters, setFilters, onClear }) => {
   };
 
   return (
-    <div className="bg-white rounded-xl border border-border p-4 mb-6 shadow-sm">
+    <form 
+      onSubmit={(e) => e.preventDefault()} 
+      className="bg-white rounded-xl border border-border p-4 mb-6 shadow-sm"
+    >
       <div className="flex flex-col md:flex-row gap-4">
         {/* Global Search */}
         <div className="flex-1 relative">
@@ -43,6 +46,7 @@ const FilterBar = ({ filters, setFilters, onClear }) => {
         
         <div className="flex items-center gap-2 shrink-0">
           <button 
+            type="button"
             onClick={() => setIsExpanded(!isExpanded)}
             className={`flex items-center gap-2 px-4 py-2.5 border border-border rounded-lg text-sm font-medium transition-colors ${isExpanded ? 'bg-secondary text-foreground' : 'bg-white hover:bg-secondary'}`}
           >
@@ -51,6 +55,7 @@ const FilterBar = ({ filters, setFilters, onClear }) => {
           </button>
           
           <button 
+            type="button"
             onClick={onClear}
             className="flex items-center gap-2 px-4 py-2.5 text-destructive hover:bg-destructive/10 border border-transparent rounded-lg text-sm font-medium transition-colors whitespace-nowrap"
           >
@@ -99,7 +104,7 @@ const FilterBar = ({ filters, setFilters, onClear }) => {
           </div>
         </div>
       )}
-    </div>
+    </form>
   );
 };
 
