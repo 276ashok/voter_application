@@ -5,6 +5,7 @@ import MainLayout from './components/layout/MainLayout';
 import SummaryCards from './features/voter-data/SummaryCards';
 import DataTable from './features/voter-data/DataTable';
 import FilterBar from './features/voter-data/FilterBar';
+import SummaryBar from './features/voter-data/SummaryBar';
 import UploadZone from './features/voter-data/UploadZone';
 import AddRecordModal from './features/voter-data/AddRecordModal';
 import RecordDetailsModal from './features/voter-data/RecordDetailsModal';
@@ -17,8 +18,9 @@ function App() {
   const [records, setRecords] = useState([]);
   const [summary, setSummary] = useState(null);
   const [selectedRecord, setSelectedRecord] = useState(null);
-  
+
   const [total, setTotal] = useState(0);
+  const [filteredTotals, setFilteredTotals] = useState(null);
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(20);
 
@@ -54,7 +56,7 @@ function App() {
       const params = new URLSearchParams();
       params.append('page', pageNum);
       params.append('limit', limit);
-      
+
       Object.entries(filters).forEach(([key, value]) => {
         if (value !== '' && value !== null) {
           params.append(key, value);
@@ -67,6 +69,9 @@ function App() {
         setRecords(data.data);
         setTotal(data.total_records);
         setPage(data.current_page);
+        if (data.aggregations) {
+          setFilteredTotals(data.aggregations);
+        }
       }
     } catch (err) {
       console.error('Failed to fetch records', err);
@@ -121,9 +126,9 @@ function App() {
 
       <div className="mt-8 mb-4">
         <h2 className="text-xl font-semibold tracking-tight text-foreground mb-4">Voter Directory</h2>
-        
-        <FilterBar 
-          filters={filters} 
+
+        <FilterBar
+          filters={filters}
           setFilters={(newFilters) => {
             // Only update page to 1 if the filters actually changed to avoid infinite fetch loops
             setFilters(prev => {
@@ -133,12 +138,19 @@ function App() {
               }
               return prev;
             });
-          }} 
+          }}
           onClear={() => {
             setFilters(initialFilters);
             setPage(1);
           }}
         />
+
+        {filteredTotals && Object.values(filters).some(val => val !== '' && val !== null) && (
+          <SummaryBar 
+            totals={filteredTotals} 
+            loading={loadingRecords} 
+          />
+        )}
 
         <DataTable
           data={records}
@@ -160,7 +172,7 @@ function App() {
             onUploadSuccess={handleUploadSuccess}
           />
         )}
-        
+
         {isModalOpen && (
           <AddRecordModal
             key="add-modal"
@@ -168,7 +180,7 @@ function App() {
             onSubmit={handleManualAdd}
           />
         )}
-        
+
         {selectedRecord && (
           <RecordDetailsModal
             key="details-modal"

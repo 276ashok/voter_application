@@ -73,12 +73,30 @@ def get_records(
         query = query.filter(ElectionData.total_voters <= max_total)
         
     total = query.count()
+    
+    agg_result = query.with_entities(
+        func.sum(ElectionData.vote_count),
+        func.sum(ElectionData.male_count),
+        func.sum(ElectionData.female_count),
+        func.sum(ElectionData.other_count),
+        func.sum(ElectionData.total_voters)
+    ).first()
+    
+    aggregations = {
+        "total_votes": agg_result[0] or 0 if agg_result else 0,
+        "total_male": agg_result[1] or 0 if agg_result else 0,
+        "total_female": agg_result[2] or 0 if agg_result else 0,
+        "total_others": agg_result[3] or 0 if agg_result else 0,
+        "grand_total": agg_result[4] or 0 if agg_result else 0
+    }
+    
     records = query.offset(skip).limit(limit).all()
     
     return {
         "total_records": total,
         "current_page": page,
-        "data": records
+        "data": records,
+        "aggregations": aggregations
     }
 
 @router.post("", response_model=RecordResponse)

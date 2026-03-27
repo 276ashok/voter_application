@@ -5,13 +5,10 @@ const FilterBar = ({ filters, setFilters, onClear }) => {
   const [localFilters, setLocalFilters] = useState(filters);
   const [isExpanded, setIsExpanded] = useState(false);
 
-  // Debounce effect
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setFilters(localFilters);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, [localFilters, setFilters]);
+  const handleSubmit = (e) => {
+    if (e) e.preventDefault();
+    setFilters(localFilters);
+  };
 
   // Sync if external clear happens
   useEffect(() => {
@@ -24,8 +21,8 @@ const FilterBar = ({ filters, setFilters, onClear }) => {
   };
 
   return (
-    <form 
-      onSubmit={(e) => e.preventDefault()} 
+    <form
+      onSubmit={handleSubmit}
       className="bg-white rounded-xl border border-border p-4 mb-6 shadow-sm"
     >
       <div className="flex flex-col md:flex-row gap-4">
@@ -43,9 +40,9 @@ const FilterBar = ({ filters, setFilters, onClear }) => {
             className="w-full pl-10 pr-4 py-2.5 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all text-sm bg-background"
           />
         </div>
-        
+
         <div className="flex items-center gap-2 shrink-0">
-          <button 
+          <button
             type="button"
             onClick={() => setIsExpanded(!isExpanded)}
             className={`flex items-center gap-2 px-4 py-2.5 border border-border rounded-lg text-sm font-medium transition-colors ${isExpanded ? 'bg-secondary text-foreground' : 'bg-white hover:bg-secondary'}`}
@@ -53,8 +50,15 @@ const FilterBar = ({ filters, setFilters, onClear }) => {
             <Filter className="w-4 h-4" />
             <span className="hidden sm:inline">Advanced Filters</span>
           </button>
-          
-          <button 
+
+          <button
+            type="submit"
+            className="flex items-center gap-2 px-4 py-2.5 bg-primary text-primary-foreground hover:bg-primary/90 border border-transparent rounded-lg text-sm font-medium transition-colors whitespace-nowrap"
+          >
+            Search
+          </button>
+
+          <button
             type="button"
             onClick={onClear}
             className="flex items-center gap-2 px-4 py-2.5 text-destructive hover:bg-destructive/10 border border-transparent rounded-lg text-sm font-medium transition-colors whitespace-nowrap"
@@ -83,7 +87,7 @@ const FilterBar = ({ filters, setFilters, onClear }) => {
             <label className="block text-xs font-medium text-muted-foreground mb-1.5">Area</label>
             <input type="text" name="area" value={localFilters.area || ''} onChange={handleChange} className="w-full px-3 py-2 border border-border rounded-md text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary" placeholder="Search area..." />
           </div>
-          
+
           {/* Vote Ranges */}
           <div className="sm:col-span-2">
             <label className="block text-xs font-medium text-muted-foreground mb-1.5">Votes Range</label>
@@ -93,7 +97,7 @@ const FilterBar = ({ filters, setFilters, onClear }) => {
               <input type="number" name="max_votes" value={localFilters.max_votes || ''} onChange={handleChange} className="flex-1 w-full px-3 py-2 border border-border rounded-md text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary" placeholder="Max" />
             </div>
           </div>
-          
+
           <div className="sm:col-span-2">
             <label className="block text-xs font-medium text-muted-foreground mb-1.5">Total Voters Range</label>
             <div className="flex gap-2">

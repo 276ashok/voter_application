@@ -22,10 +22,18 @@ class RecordResponse(RecordCreate):
     class Config:
         from_attributes = True
 
+class AggregationsModel(BaseModel):
+    total_votes: int
+    total_male: int
+    total_female: int
+    total_others: int
+    grand_total: int
+
 class PaginatedResponse(BaseModel):
     total_records: int
     current_page: int
     data: List[RecordResponse]
+    aggregations: AggregationsModel
 
 class SummaryResponse(BaseModel):
     total_records: int

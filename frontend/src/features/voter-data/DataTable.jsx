@@ -6,7 +6,7 @@ import {
 } from '@tanstack/react-table';
 import { ChevronLeft, ChevronRight, Inbox } from 'lucide-react';
 
-const DataTable = ({ data, loading, page, total, setPage, limit = 20, setLimit, onRowClick }) => {
+const DataTable = ({ data, loading, page, total, setPage, limit = 20, setLimit, onRowClick, filteredTotals }) => {
   const columns = useMemo(
     () => [
       { accessorKey: 'serial_no', header: 'Serial', cell: info => info.getValue() || '-' },

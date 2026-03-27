@@ -6,14 +6,14 @@ const RecordDetailsModal = ({ record, onClose }) => {
   if (!record) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-background/80 backdrop-blur-sm overflow-hidden">
       <motion.div 
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        className="glass-panel w-full max-w-2xl rounded-xl shadow-2xl overflow-hidden relative my-8 border border-white/10"
+        className="glass-panel w-full max-w-2xl max-h-[95vh] sm:max-h-[90vh] flex flex-col rounded-xl shadow-2xl relative border border-white/10"
       >
-        <div className="px-6 py-5 border-b border-border/50 flex justify-between items-center bg-muted/20">
+        <div className="px-4 sm:px-6 py-4 sm:py-5 border-b border-border/50 flex justify-between items-center bg-muted/20 shrink-0">
           <div className="flex items-center gap-3">
             <div className="bg-primary/20 text-primary p-2 rounded-lg">
               <Hash className="w-5 h-5" />
@@ -28,7 +28,7 @@ const RecordDetailsModal = ({ record, onClose }) => {
           </button>
         </div>
 
-        <div className="p-6 space-y-8">
+        <div className="p-4 sm:p-6 space-y-6 sm:space-y-8 overflow-y-auto flex-1 custom-scrollbar">
           {/* Location Details */}
           <div>
             <div className="flex items-center gap-2 mb-4 px-1">
@@ -90,7 +90,7 @@ const RecordDetailsModal = ({ record, onClose }) => {
           </div>
         </div>
 
-        <div className="px-6 py-4 border-t border-border/50 bg-muted/10 flex justify-end">
+        <div className="px-4 sm:px-6 py-4 border-t border-border/50 bg-muted/10 flex justify-end shrink-0">
           <button 
             onClick={onClose} 
             className="px-6 py-2 bg-background border border-border rounded-lg text-sm font-medium hover:bg-secondary transition-colors"
