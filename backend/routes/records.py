@@ -41,7 +41,7 @@ def get_analytics(db: Session = Depends(get_db)):
     ward_agg = db.query(
         ElectionData.ward_no,
         func.sum(ElectionData.total_voters)
-    ).group_by(ElectionData.ward_no).order_by(func.sum(ElectionData.total_voters).desc()).limit(10).all()
+    ).group_by(ElectionData.ward_no).order_by(func.sum(ElectionData.total_voters).desc()).all()
     
     ward_distribution = [
         {"name": f"Ward {row[0]}", "value": row[1] or 0} for row in ward_agg if row[1]
@@ -50,7 +50,7 @@ def get_analytics(db: Session = Depends(get_db)):
     area_agg = db.query(
         ElectionData.voter_area,
         func.sum(ElectionData.total_voters)
-    ).group_by(ElectionData.voter_area).order_by(func.sum(ElectionData.total_voters).desc()).limit(7).all()
+    ).group_by(ElectionData.voter_area).order_by(func.sum(ElectionData.total_voters).desc()).all()
 
     top_areas = [
         {"name": row[0] if row[0] else "Unknown", "value": row[1] or 0} for row in area_agg if row[1]
