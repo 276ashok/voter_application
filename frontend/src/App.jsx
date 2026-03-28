@@ -8,6 +8,7 @@ import FilterBar from './features/voter-data/FilterBar';
 import SummaryBar from './features/voter-data/SummaryBar';
 import UploadZone from './features/voter-data/UploadZone';
 import AddRecordModal from './features/voter-data/AddRecordModal';
+import EditRecordModal from './features/voter-data/EditRecordModal';
 import RecordDetailsModal from './features/voter-data/RecordDetailsModal';
 
 import './index.css';
@@ -18,6 +19,7 @@ function App() {
   const [records, setRecords] = useState([]);
   const [summary, setSummary] = useState(null);
   const [selectedRecord, setSelectedRecord] = useState(null);
+  const [editingRecord, setEditingRecord] = useState(null);
 
   const [total, setTotal] = useState(0);
   const [filteredTotals, setFilteredTotals] = useState(null);
@@ -112,6 +114,44 @@ function App() {
     }
   };
 
+  const handleEditRecord = async (formData, id) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/records/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+      if (res.ok) {
+        setEditingRecord(null);
+        fetchSummary();
+        fetchRecords(page);
+      } else {
+        alert('Failed to update record. Please check validation requirements.');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Error connecting to backend');
+    }
+  };
+
+  const handleDeleteRecord = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this record? This action cannot be undone.")) return;
+    try {
+      const res = await fetch(`${API_BASE_URL}/records/${id}`, {
+        method: 'DELETE',
+      });
+      if (res.ok) {
+        fetchSummary();
+        fetchRecords(page);
+      } else {
+        alert('Failed to delete record.');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Error connecting to backend');
+    }
+  };
+
   return (
     <MainLayout
       onAddRecord={() => setIsModalOpen(true)}
@@ -161,6 +201,8 @@ function App() {
           limit={limit}
           setLimit={setLimit}
           onRowClick={(record) => setSelectedRecord(record)}
+          onEditClick={(record) => setEditingRecord(record)}
+          onDeleteClick={(record) => handleDeleteRecord(record.id)}
         />
       </div>
 
@@ -186,6 +228,15 @@ function App() {
             key="details-modal"
             record={selectedRecord}
             onClose={() => setSelectedRecord(null)}
+          />
+        )}
+
+        {editingRecord && (
+          <EditRecordModal
+            key="edit-modal"
+            recordToEdit={editingRecord}
+            onClose={() => setEditingRecord(null)}
+            onSubmit={handleEditRecord}
           />
         )}
       </AnimatePresence>

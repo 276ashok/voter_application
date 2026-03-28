@@ -4,9 +4,61 @@ import {
   getCoreRowModel,
   flexRender,
 } from '@tanstack/react-table';
-import { ChevronLeft, ChevronRight, Inbox } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Inbox, MoreVertical, Eye, Edit2, Trash2 } from 'lucide-react';
 
-const DataTable = ({ data, loading, page, total, setPage, limit = 20, setLimit, onRowClick, filteredTotals }) => {
+const ActionMenu = ({ record, onView, onEdit, onDelete }) => {
+  const [isOpen, setIsOpen] = React.useState(false);
+  const menuRef = React.useRef(null);
+
+  React.useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) setIsOpen(false);
+    };
+    if (isOpen) document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isOpen]);
+
+  return (
+    <div className="relative inline-block text-left" ref={menuRef}>
+      <button 
+        onClick={(e) => { e.stopPropagation(); setIsOpen(!isOpen); }}
+        className="p-1.5 rounded-md text-muted-foreground hover:bg-muted/50 hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-primary/50"
+        title="Actions"
+      >
+        <MoreVertical className="w-5 h-5" />
+      </button>
+
+      {isOpen && (
+        <div className="absolute right-0 mt-2 w-36 rounded-md shadow-xl ring-1 ring-border/50 divide-y divide-border/50 z-[100] focus:outline-none border border-border bg-white" onClick={e => e.stopPropagation()}>
+          <div className="py-1">
+            <button 
+              onClick={() => { setIsOpen(false); onView && onView(record); }}
+              className="group flex w-full items-center px-4 py-2 text-sm text-foreground hover:bg-muted/50 hover:text-primary transition-colors cursor-pointer"
+            >
+              <Eye className="mr-3 h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" /> View
+            </button>
+            <button 
+              onClick={() => { setIsOpen(false); onEdit && onEdit(record); }}
+              className="group flex w-full items-center px-4 py-2 text-sm text-foreground hover:bg-muted/50 hover:text-blue-600 transition-colors cursor-pointer"
+            >
+              <Edit2 className="mr-3 h-4 w-4 text-muted-foreground group-hover:text-blue-600 transition-colors" /> Edit
+            </button>
+          </div>
+          <div className="py-1">
+            <button 
+              onClick={() => { setIsOpen(false); onDelete && onDelete(record); }}
+              className="group flex w-full items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 hover:text-red-700 transition-colors font-medium cursor-pointer"
+            >
+              <Trash2 className="mr-3 h-4 w-4" /> Delete
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+const DataTable = ({ data, loading, page, total, setPage, limit = 20, setLimit, onRowClick, onEditClick, onDeleteClick, filteredTotals }) => {
   const columns = useMemo(
     () => [
       { accessorKey: 'serial_no', header: 'Serial', cell: info => info.getValue() || '-' },
@@ -58,11 +110,25 @@ const DataTable = ({ data, loading, page, total, setPage, limit = 20, setLimit, 
       },
       { 
         accessorKey: 'total_voters', 
-        header: () => <div className="text-right pr-2 font-bold text-primary">Total</div>, 
+        header: () => <div className="text-right pr-2 font-bold text-primary whitespace-nowrap">Total</div>, 
         cell: info => <div className="text-right pr-2 font-bold text-primary"><span className="bg-primary/10 px-2 py-1 rounded inline-block min-w-[2.5rem] text-center">{info.getValue() || 0}</span></div> 
       },
+      { 
+        accessorKey: 'actions', 
+        header: () => <div className="text-center font-bold text-muted-foreground whitespace-nowrap">Actions</div>, 
+        cell: info => (
+          <div className="flex justify-center items-center w-full">
+            <ActionMenu 
+              record={info.row.original} 
+              onView={onRowClick} 
+              onEdit={onEditClick} 
+              onDelete={onDeleteClick} 
+            />
+          </div>
+        ) 
+      },
     ],
-    []
+    [onRowClick, onEditClick, onDeleteClick]
   );
 
   const table = useReactTable({
@@ -82,14 +148,28 @@ const DataTable = ({ data, loading, page, total, setPage, limit = 20, setLimit, 
           <thead className="text-xs text-muted-foreground uppercase bg-muted/80 backdrop-blur-md sticky top-0 z-10 shadow-sm">
             {table.getHeaderGroups().map(headerGroup => (
               <tr key={headerGroup.id}>
-                {headerGroup.headers.map(header => (
-                  <th key={header.id} className="px-3 py-4 font-medium tracking-wider whitespace-nowrap text-center border border-border bg-muted/50">
-                    {flexRender(
-                      header.column.columnDef.header,
-                      header.getContext()
-                    )}
-                  </th>
-                ))}
+                {headerGroup.headers.map((header, idx, arr) => {
+                  const isLast = idx === arr.length - 1;
+                  const isTotal = idx === arr.length - 2;
+                  
+                  let customClasses = "";
+                  if (isLast) {
+                     customClasses = "w-[80px] min-w-[80px] sticky right-0 z-20 border-l border-l-border shadow-[-4px_0_10px_-4px_rgba(0,0,0,0.1)] bg-muted/90 backdrop-blur-md";
+                  } else if (isTotal) {
+                     customClasses = "border-r border-border bg-muted/50";
+                  } else {
+                     customClasses = "bg-muted/50";
+                  }
+
+                  return (
+                    <th key={header.id} className={`px-4 py-2 font-medium tracking-wider whitespace-nowrap text-center border border-border ${customClasses}`}>
+                      {flexRender(
+                        header.column.columnDef.header,
+                        header.getContext()
+                      )}
+                    </th>
+                  );
+                })}
               </tr>
             ))}
           </thead>
@@ -143,6 +223,16 @@ const DataTable = ({ data, loading, page, total, setPage, limit = 20, setLimit, 
                       const mergeableCols = ['serial_no', 'part_no', 'booth_address', 'voter_area', 'male_count', 'female_count', 'other_count', 'total_voters'];
                       const isMergeable = mergeableCols.includes(colId);
 
+                      const isLast = cell.column.id === 'actions';
+                      const isTotal = cell.column.id === 'total_voters';
+                      
+                      let customClass = "";
+                      if (isLast) {
+                        customClass = "w-[80px] min-w-[80px] sticky right-0 z-10 bg-white/100 border-l border-l-border shadow-[-4px_0_10px_-4px_rgba(0,0,0,0.05)]";
+                      } else if (isTotal) {
+                        customClass = "border-r border-r-border";
+                      }
+
                       if (isMergeable) {
                         if (!isFirstInBlock) return null; // Omit TD completely for rowSpan to work!
                         
@@ -151,7 +241,7 @@ const DataTable = ({ data, loading, page, total, setPage, limit = 20, setLimit, 
                             key={cell.id} 
                             rowSpan={rowSpan} 
                             onClick={() => onRowClick && onRowClick(row.original)}
-                            className="px-4 py-3.5 whitespace-nowrap text-center border border-border"
+                            className={`px-4 py-2 whitespace-nowrap text-center border border-border ${customClass}`}
                           >
                             {flexRender(cell.column.columnDef.cell, cell.getContext())}
                           </td>
@@ -161,8 +251,8 @@ const DataTable = ({ data, loading, page, total, setPage, limit = 20, setLimit, 
                         return (
                           <td 
                             key={cell.id} 
-                            onClick={() => onRowClick && onRowClick(row.original)}
-                            className="px-3 py-3 whitespace-nowrap align-middle text-center border border-border"
+                            onClick={() => !isLast && onRowClick && onRowClick(row.original)}
+                            className={`px-4 py-2 whitespace-nowrap text-center text-foreground border border-border ${customClass}`}
                           >
                             {flexRender(cell.column.columnDef.cell, cell.getContext())}
                           </td>

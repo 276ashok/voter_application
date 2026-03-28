@@ -113,3 +113,31 @@ def create_record(record: RecordCreate, db: Session = Depends(get_db)):
     db.refresh(db_record)
     
     return db_record
+
+@router.put("/{record_id}", response_model=RecordResponse)
+def update_record(record_id: int, record: RecordCreate, db: Session = Depends(get_db)):
+    db_record = db.query(ElectionData).filter(ElectionData.id == record_id).first()
+    if not db_record:
+        raise HTTPException(status_code=404, detail="Record not found")
+        
+    total = (record.male_count or 0) + (record.female_count or 0) + (record.other_count or 0)
+    
+    update_data = record.model_dump()
+    update_data['total_voters'] = total
+    
+    for key, value in update_data.items():
+        setattr(db_record, key, value)
+        
+    db.commit()
+    db.refresh(db_record)
+    return db_record
+
+@router.delete("/{record_id}")
+def delete_record(record_id: int, db: Session = Depends(get_db)):
+    db_record = db.query(ElectionData).filter(ElectionData.id == record_id).first()
+    if not db_record:
+        raise HTTPException(status_code=404, detail="Record not found")
+        
+    db.delete(db_record)
+    db.commit()
+    return {"message": "Record deleted successfully"}
