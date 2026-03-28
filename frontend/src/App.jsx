@@ -10,6 +10,7 @@ import UploadZone from './features/voter-data/UploadZone';
 import AddRecordModal from './features/voter-data/AddRecordModal';
 import EditRecordModal from './features/voter-data/EditRecordModal';
 import RecordDetailsModal from './features/voter-data/RecordDetailsModal';
+import DashboardView from './features/voter-data/DashboardView';
 
 import './index.css';
 
@@ -20,6 +21,7 @@ function App() {
   const [summary, setSummary] = useState(null);
   const [selectedRecord, setSelectedRecord] = useState(null);
   const [editingRecord, setEditingRecord] = useState(null);
+  const [currentPage, setCurrentPage] = useState('dashboard');
 
   const [total, setTotal] = useState(0);
   const [filteredTotals, setFilteredTotals] = useState(null);
@@ -156,18 +158,28 @@ function App() {
     <MainLayout
       onAddRecord={() => setIsModalOpen(true)}
       onUpload={() => setIsUploadOpen(true)}
+      currentPage={currentPage}
+      setCurrentPage={setCurrentPage}
     >
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold tracking-tight text-foreground">Overview</h2>
-        <p className="text-muted-foreground text-sm">A summary of the current electoral data.</p>
-      </div>
+      {currentPage === 'dashboard' ? (
+        <div className="animate-in fade-in duration-300">
+          <div className="mb-6 flex flex-col gap-1">
+            <h2 className="text-2xl font-bold tracking-tight text-foreground">Analytics Dashboard</h2>
+            <p className="text-muted-foreground text-sm">High-level visual insights into your active electoral database.</p>
+          </div>
+          
+          <SummaryCards summary={summary} loading={loadingSummary} />
+          
+          <DashboardView />
+        </div>
+      ) : (
+        <div className="animate-in fade-in duration-300">
+          <div className="mb-8 flex flex-col gap-1 border-b border-border pb-4">
+            <h2 className="text-2xl font-bold tracking-tight text-foreground">Voter Directory</h2>
+            <p className="text-muted-foreground text-sm">Filter, manage, and update all individual registered voters.</p>
+          </div>
 
-      <SummaryCards summary={summary} loading={loadingSummary} />
-
-      <div className="mt-8 mb-4">
-        <h2 className="text-xl font-semibold tracking-tight text-foreground mb-4">Voter Directory</h2>
-
-        <FilterBar
+          <FilterBar
           filters={filters}
           setFilters={(newFilters) => {
             // Only update page to 1 if the filters actually changed to avoid infinite fetch loops
@@ -204,7 +216,8 @@ function App() {
           onEditClick={(record) => setEditingRecord(record)}
           onDeleteClick={(record) => handleDeleteRecord(record.id)}
         />
-      </div>
+        </div>
+      )}
 
       <AnimatePresence>
         {isUploadOpen && (
@@ -220,6 +233,7 @@ function App() {
             key="add-modal"
             onClose={() => setIsModalOpen(false)}
             onSubmit={handleManualAdd}
+            initialFilters={filters}
           />
         )}
 

@@ -40,3 +40,12 @@ class SummaryResponse(BaseModel):
     total_voters: int
     total_male: int
     total_female: int
+
+class ChartDataPoint(BaseModel):
+    name: str
+    value: int
+
+class DashboardAnalyticsResponse(BaseModel):
+    gender_distribution: List[ChartDataPoint]
+    ward_distribution: List[ChartDataPoint]
+    top_areas: List[ChartDataPoint]

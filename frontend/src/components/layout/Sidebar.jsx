@@ -1,10 +1,10 @@
 import React from 'react';
 import { LayoutDashboard, Users, X } from 'lucide-react';
 
-const Sidebar = ({ isOpen, setIsOpen }) => {
+const Sidebar = ({ isOpen, setIsOpen, currentPage, setCurrentPage }) => {
   const navItems = [
-    { name: 'Dashboard', icon: LayoutDashboard, active: false },
-    { name: 'Voter Data', icon: Users, active: true },
+    { id: 'dashboard', name: 'Dashboard', icon: LayoutDashboard },
+    { id: 'voter-data', name: 'Voter Data', icon: Users },
   ];
 
   return (
@@ -24,11 +24,16 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
         <nav className="space-y-1">
           {navItems.map((item) => {
             const Icon = item.icon;
+            const isActive = currentPage === item.id;
             return (
               <button
                 key={item.name}
+                onClick={() => {
+                   if(setCurrentPage) setCurrentPage(item.id);
+                   setIsOpen(false);
+                }}
                 className={`w-full flex items-center px-3 py-2.5 rounded-md transition-colors text-sm font-medium ${
-                  item.active
+                  isActive
                     ? 'bg-primary/10 text-primary'
                     : 'text-muted-foreground hover:bg-secondary hover:text-foreground'
                 }`}

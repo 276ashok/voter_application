@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from database import get_db
 from models import ElectionData
-from schemas import RecordCreate, RecordResponse, PaginatedResponse, SummaryResponse
+from schemas import RecordCreate, RecordResponse, PaginatedResponse, SummaryResponse, DashboardAnalyticsResponse
 from typing import List, Optional
 from sqlalchemy import func, or_
 
@@ -22,6 +22,44 @@ def get_summary(db: Session = Depends(get_db)):
         "total_voters": aggregates[0] or 0 if aggregates else 0,
         "total_male": aggregates[1] or 0 if aggregates else 0,
         "total_female": aggregates[2] or 0 if aggregates else 0
+    }
+
+@router.get("/analytics", response_model=DashboardAnalyticsResponse)
+def get_analytics(db: Session = Depends(get_db)):
+    gender_agg = db.query(
+        func.sum(ElectionData.male_count),
+        func.sum(ElectionData.female_count),
+        func.sum(ElectionData.other_count)
+    ).first()
+    
+    gender_distribution = [
+        {"name": "Male", "value": gender_agg[0] or 0},
+        {"name": "Female", "value": gender_agg[1] or 0},
+        {"name": "Other", "value": gender_agg[2] or 0}
+    ]
+
+    ward_agg = db.query(
+        ElectionData.ward_no,
+        func.sum(ElectionData.total_voters)
+    ).group_by(ElectionData.ward_no).order_by(func.sum(ElectionData.total_voters).desc()).limit(10).all()
+    
+    ward_distribution = [
+        {"name": f"Ward {row[0]}", "value": row[1] or 0} for row in ward_agg if row[1]
+    ]
+
+    area_agg = db.query(
+        ElectionData.voter_area,
+        func.sum(ElectionData.total_voters)
+    ).group_by(ElectionData.voter_area).order_by(func.sum(ElectionData.total_voters).desc()).limit(7).all()
+
+    top_areas = [
+        {"name": row[0] if row[0] else "Unknown", "value": row[1] or 0} for row in area_agg if row[1]
+    ]
+
+    return {
+        "gender_distribution": gender_distribution,
+        "ward_distribution": ward_distribution,
+        "top_areas": top_areas
     }
 
 @router.get("", response_model=PaginatedResponse)

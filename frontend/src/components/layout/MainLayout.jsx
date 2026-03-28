@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Navbar from './Navbar';
 import Sidebar from './Sidebar';
 
-const MainLayout = ({ children, onAddRecord, onUpload }) => {
+const MainLayout = ({ children, onAddRecord, onUpload, currentPage, setCurrentPage }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
@@ -13,7 +13,7 @@ const MainLayout = ({ children, onAddRecord, onUpload }) => {
         toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
       />
       <div className="flex flex-1 overflow-hidden">
-        <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
+        <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} currentPage={currentPage} setCurrentPage={setCurrentPage} />
         <main className="flex-1 w-full min-w-0 overflow-y-auto">
           <div className="p-4 md:p-6 max-w-7xl mx-auto pb-24">
             {children}
