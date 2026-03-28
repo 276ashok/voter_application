@@ -5,8 +5,7 @@ from sqlalchemy.orm import sessionmaker
 
 # Environment fallback using the brand new Postgres cluster URI explicitly.
 SQLALCHEMY_DATABASE_URL = os.getenv(
-    "DATABASE_URL", 
-    "postgresql://voters_management_user:lruOnBvK0u5VQERfWFR7lIa3T9i2PMCo@dpg-d73lk4tactks7380vg90-a.oregon-postgres.render.com/voters_management"
+    "DATABASE_URL"
 )
 
 engine = create_engine(
